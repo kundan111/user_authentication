@@ -331,8 +331,8 @@ class Account
 			- insert a new row with the session id, if it doesn't exist, or...
 			- update the row having the session id, if it does exist.
 		*/
-            $query = 'REPLACE INTO user_auth.account_sessions (session_id, account_id, login_time) VALUES (:sid, :accountId, NOW())';
-            $values = array(':sid' => session_id(), ':accountId' => $this->id);
+            $query = 'REPLACE INTO user_auth.account_sessions (session_id, account_id, login_time, logged_in_user) VALUES (:sid, :accountId, NOW(),:logged_in_user)';
+            $values = array(':sid' => session_id(), ':accountId' => $this->id, ':logged_in_user' => $this->name);
 
             /* Execute the query */
             try {
