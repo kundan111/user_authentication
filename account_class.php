@@ -398,6 +398,7 @@ class Account
 
         /* If there is no logged in user, do nothing */
         if (is_null($this->id)) {
+            echo "this->id is null";
             return;
         }
 
@@ -418,10 +419,14 @@ class Account
             try {
                 $res = $pdo->prepare($query);
                 $res->execute($values);
+
+                return TRUE;
             } catch (PDOException $e) {
                 /* If there is a PDO exception, throw a standard exception */
                 throw new Exception('Database query error');
             }
+
+            return FALSE;
         }
     }
 
@@ -462,5 +467,38 @@ class Account
     public function getName()
     {
         return $this->name;
+    }
+
+
+    public function get_user_with_this_sessionId()
+    {
+
+        global $pdo;
+
+        /* Check that a Session has been started */
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            /* Delete all account Sessions with session_id different from the current one */
+            $query = 'SELECT * FROM user_auth.account_sessions WHERE (session_id = :sid) ';
+
+            /* Values array for PDO */
+            $values = array(':sid' => session_id());
+
+            /* Execute the query */
+            try {
+                $res = $pdo->prepare($query);
+                $res->execute($values);
+            } catch (PDOException $e) {
+                /* If there is a PDO exception, throw a standard exception */
+                throw new Exception('Database query error');
+            }
+
+            $row = $res->fetch(PDO::FETCH_ASSOC);
+
+            if (is_array($row)) {
+                return $row;
+            } else {
+                return FALSE;
+            }
+        }
     }
 }
